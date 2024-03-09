@@ -1,15 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:pilem/models/movie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DetailScreen extends StatelessWidget {
+class DetailScreen extends StatefulWidget {
   final Movie movie;
   const DetailScreen({super.key, required this.movie});
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _checkisFavorite();
+  }
+
+  Future<void> _checkisFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isFavorite = prefs.containsKey('movie_${widget.movie.id}');
+    });
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(movie.title),
+        title: Text(widget.movie.title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -18,8 +42,8 @@ class DetailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Image.network(
-                      movie.backdropPath != ''
-                      ? 'https://image.tmdb.org/t/p/w500${movie.backdropPath}'
+                      widget.movie.backdropPath != ''
+                      ? 'https://image.tmdb.org/t/p/w500${widget.movie.backdropPath}'
                       : 'https://via.placeholder.com/50x50.png?text=No+Image',
                       height: 300,
                 width: double.infinity,
@@ -34,20 +58,20 @@ class DetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(movie.overview,
+              Text(widget.movie.overview,
                 textAlign: TextAlign.justify,),
               const SizedBox(height: 20),
               Row(children: [const Icon(Icons.calendar_month, color: Colors.blue),
               const SizedBox(width: 10,),
               const Text('Release Date', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
               const SizedBox(width: 10,),
-              Text(movie.releaseDate,),
+              Text(widget.movie.releaseDate,),
               ],),
               Row(children: [const Icon(Icons.star, color: Colors.amber),
               const SizedBox(width: 10,),
               const Text('Rating', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
               const SizedBox(width: 10,),
-              Text(movie.voteAverage.toString(),),
+              Text(widget.movie.voteAverage.toString(),),
               ],),
               ],)
             
